@@ -1,4 +1,9 @@
-const { kv } = require('@vercel/kv');
+let kv;
+try {
+  kv = require('@vercel/kv');
+} catch (e) {
+  kv = null;
+}
 
 module.exports = async (_, res) => {
   const headers = {
@@ -8,13 +13,15 @@ module.exports = async (_, res) => {
 
   try {
     let latestData = null;
-    try {
-      const stored = await kv.get('ecg:latest');
-      if (stored) {
-        latestData = JSON.parse(stored);
+    if (kv) {
+      try {
+        const stored = await kv.get('ecg:latest');
+        if (stored) {
+          latestData = JSON.parse(stored);
+        }
+      } catch (kvError) {
+        console.log('KV read failed:', kvError.message);
       }
-    } catch (kvError) {
-      console.log('KV not available');
     }
 
     if (!latestData || !latestData.receivedAt) {

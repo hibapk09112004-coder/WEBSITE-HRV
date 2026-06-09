@@ -1,4 +1,9 @@
-const { kv } = require('@vercel/kv');
+let kv;
+try {
+  kv = require('@vercel/kv');
+} catch (e) {
+  kv = null;
+}
 
 const headers = {
   'Content-Type': 'application/json',
@@ -38,10 +43,12 @@ module.exports = async (req, res) => {
       receivedAt: Date.now(),
     };
 
-    try {
-      await kv.set('ecg:latest', JSON.stringify(payload), { ex: 300 });
-    } catch (kvError) {
-      console.log('KV not available');
+    if (kv) {
+      try {
+        await kv.set('ecg:latest', JSON.stringify(payload), { ex: 300 });
+      } catch (kvError) {
+        console.log('KV write failed:', kvError.message);
+      }
     }
 
     res.writeHead(200, headers);
