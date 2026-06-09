@@ -1,20 +1,11 @@
-// Shared in-memory storage for sensor data
-// This works within a single Vercel instance
-let latestSensorData = {
-  heartRate: 0,
-  spo2: 0,
-  hrv: 0,
-  ecgStatus: 'Unknown',
-  fallDetected: false,
-  battery: 0,
-  receivedAt: 0,
-};
+const { kv } = require('@vercel/kv');
 
 module.exports = {
-  setLatestData: (data) => {
-    latestSensorData = { ...data };
+  async setLatestData(data) {
+    await kv.set('latestData', data);
   },
-  getLatestData: () => {
-    return { ...latestSensorData };
+
+  async getLatestData() {
+    return await kv.get('latestData');
   },
 };

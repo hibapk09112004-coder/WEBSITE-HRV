@@ -1,9 +1,5 @@
-let kv;
-try {
-  kv = require('@vercel/kv');
-} catch (e) {
-  kv = null;
-}
+let latestData = null;
+const storage = require('./shared-storage');
 
 const headers = {
   'Content-Type': 'application/json',
@@ -43,13 +39,7 @@ module.exports = async (req, res) => {
       receivedAt: Date.now(),
     };
 
-    if (kv) {
-      try {
-        await kv.set('ecg:latest', JSON.stringify(payload), { ex: 300 });
-      } catch (kvError) {
-        console.log('KV write failed:', kvError.message);
-      }
-    }
+    await storage.setLatestData(payload);
 
     res.writeHead(200, headers);
     res.end(JSON.stringify({ success: true, payload }));
@@ -69,3 +59,6 @@ function getBody(req) {
     req.on('error', reject);
   });
 }
+
+module.exports.getLatestData = () => latestData;
+

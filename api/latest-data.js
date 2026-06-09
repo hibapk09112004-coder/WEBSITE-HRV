@@ -1,28 +1,13 @@
-let kv;
-try {
-  kv = require('@vercel/kv');
-} catch (e) {
-  kv = null;
-}
+const updateData = require('./update-data');
+
+const headers = {
+  'Content-Type': 'application/json',
+  'Access-Control-Allow-Origin': '*',
+};
 
 module.exports = async (_, res) => {
-  const headers = {
-    'Content-Type': 'application/json',
-    'Access-Control-Allow-Origin': '*',
-  };
-
   try {
-    let latestData = null;
-    if (kv) {
-      try {
-        const stored = await kv.get('ecg:latest');
-        if (stored) {
-          latestData = JSON.parse(stored);
-        }
-      } catch (kvError) {
-        console.log('KV read failed:', kvError.message);
-      }
-    }
+    const latestData = await storage.getLatestData();
 
     if (!latestData || !latestData.receivedAt) {
       res.writeHead(200, headers);
@@ -68,3 +53,4 @@ module.exports = async (_, res) => {
     );
   }
 };
+
