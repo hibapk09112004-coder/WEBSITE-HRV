@@ -50,6 +50,8 @@ bool sendData(int rawEcg) {
 
   String payload = buildPayload(rawEcg);
   Serial.println("\n--- Sending sensor payload ---");
+  Serial.printf("URL: %s\n", serverUrl);
+  Serial.printf("Payload length: %u\n", payload.length());
   Serial.println(payload);
 
   WiFiClientSecure client;
@@ -60,18 +62,19 @@ bool sendData(int rawEcg) {
   https.addHeader("Content-Type", "application/json");
 
   int httpCode = https.POST(payload);
-  if (httpCode > 0) {
-    Serial.printf("POST response code: %d\n", httpCode);
-    String response = https.getString();
-    Serial.println("Backend response:");
-    Serial.println(response);
-    https.end();
-    return httpCode == 200;
-  } else {
+  String response = https.getString();
+  Serial.printf("POST response code: %d\n", httpCode);
+  Serial.println("Backend response:");
+  Serial.println(response);
+
+  if (httpCode <= 0) {
     Serial.printf("POST failed, error: %s\n", https.errorToString(httpCode).c_str());
-    https.end();
-    return false;
+  } else if (httpCode != 200) {
+    Serial.println("Server returned non-200 status.");
   }
+
+  https.end();
+  return httpCode == 200;
 }
 
 void setup() {

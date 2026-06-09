@@ -1,5 +1,4 @@
-const fs = require('fs').promises;
-const storagePath = '/tmp/latest-ecg-data.json';
+const storage = require('./shared-storage');
 
 const headers = {
   'Content-Type': 'application/json',
@@ -7,6 +6,9 @@ const headers = {
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type',
 };
+
+// Simple in-memory fallback
+let latestData = { receivedAt: 0 };
 
 module.exports = async (req, res) => {
   if (req.method === 'OPTIONS') {
@@ -39,7 +41,7 @@ module.exports = async (req, res) => {
       receivedAt: Date.now(),
     };
 
-    await fs.writeFile(storagePath, JSON.stringify(payload), 'utf8');
+    storage.setLatestData(payload);
 
     res.writeHead(200, headers);
     res.end(JSON.stringify({ success: true, payload }));
@@ -48,6 +50,8 @@ module.exports = async (req, res) => {
     res.end(JSON.stringify({ error: 'Invalid JSON payload', details: error.message }));
   }
 };
+
+module.exports.getLatestData = () => latestData;
 
 function getBody(req) {
   return new Promise((resolve, reject) => {
