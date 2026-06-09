@@ -5,8 +5,8 @@
 
 #define ECG_PIN A0
 
-const char* ssid = "EMG_MONITOR";
-const char* password = "12345678";
+const char* ssid = "OPPO A3 Pro 5G";
+const char* password = "password!";
 const char* serverUrl = "https://ecgmonitor.vercel.app/api/update-data";
 const unsigned long sendIntervalMs = 1000;
 unsigned long lastSendMs = 0;
