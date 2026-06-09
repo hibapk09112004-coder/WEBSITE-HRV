@@ -1,72 +1,98 @@
 #include <Arduino.h>
 #include <WiFi.h>
-#include <WebServer.h>
+#include <HTTPClient.h>
+#include <WiFiClientSecure.h>
 
 #define ECG_PIN A0
 
-const char* ssid = "ECG_MONITOR";
+const char* ssid = "EMG_MONITOR";
 const char* password = "12345678";
+const char* serverUrl = "https://ecgmonitor.vercel.app/api/update-data";
+const unsigned long sendIntervalMs = 1000;
+unsigned long lastSendMs = 0;
 
-WebServer server(80);
-
-void handleRoot() {
-  int ecgValue = analogRead(ECG_PIN);
-
-  String html = R"rawliteral(
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<meta http-equiv="refresh" content="1">
-<title>ECG Monitor</title>
-<style>
-body {
-  font-family: Arial, sans-serif;
-  text-align: center;
-  margin-top: 40px;
+void connectWiFi() {
+  Serial.printf("Connecting to Wi-Fi '%s'...\n", ssid);
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED) {
+    Serial.print(".");
+    delay(500);
+  }
+  Serial.println();
+  Serial.print("Wi-Fi connected. IP address: ");
+  Serial.println(WiFi.localIP());
 }
-.value {
-  font-size: 32px;
-  color: blue;
+
+String buildPayload(int rawEcg) {
+  int heartRate = 72;  // Replace with actual BPM logic
+  int spo2 = 98;      // Replace with real SpO2 logic
+  int hrv = 45;       // Replace with HRV calculation
+  bool fallDetected = false;
+  int battery = 87;
+
+  String payload = "{";
+  payload += "\"heartRate\":" + String(heartRate) + ",";
+  payload += "\"spo2\":" + String(spo2) + ",";
+  payload += "\"hrv\":" + String(hrv) + ",";
+  payload += "\"ecgStatus\":\"Normal\",";
+  payload += "\"fallDetected\":" + String(fallDetected ? "true" : "false") + ",";
+  payload += "\"battery\":" + String(battery);
+  payload += "}";
+
+  return payload;
 }
-</style>
-</head>
-<body>
-<h1>Portable ECG Monitoring System</h1>
-<p>ECG Signal Value:</p>
-<div class="value">
-)rawliteral";
 
-  html += String(ecgValue);
+bool sendData(int rawEcg) {
+  if (WiFi.status() != WL_CONNECTED) {
+    Serial.println("Wi-Fi is not connected, cannot send data.");
+    return false;
+  }
 
-  html += R"rawliteral(
-</div>
-</body>
-</html>
-)rawliteral";
-https://git-scm.com/download/win
-  server.send(200, "text/html", html);
+  String payload = buildPayload(rawEcg);
+  Serial.println("\n--- Sending sensor payload ---");
+  Serial.println(payload);
+
+  WiFiClientSecure client;
+  client.setInsecure();
+
+  HTTPClient https;
+  https.begin(client, serverUrl);
+  https.addHeader("Content-Type", "application/json");
+
+  int httpCode = https.POST(payload);
+  if (httpCode > 0) {
+    Serial.printf("POST response code: %d\n", httpCode);
+    String response = https.getString();
+    Serial.println("Backend response:");
+    Serial.println(response);
+    https.end();
+    return httpCode == 200;
+  } else {
+    Serial.printf("POST failed, error: %s\n", https.errorToString(httpCode).c_str());
+    https.end();
+    return false;
+  }
 }
 
 void setup() {
   Serial.begin(115200);
-
+  delay(1000);
   pinMode(ECG_PIN, INPUT);
-
-  // Create Wi-Fi hotspot
-  WiFi.softAP(ssid, password);
-
-  Serial.println("WiFi Access Point Started");
-  Serial.print("IP Address: ");
-  Serial.println(WiFi.softAPIP());
-
-  server.on("/", handleRoot);
-
-  server.begin();
-
-  Serial.println("Web Server Started");
+  connectWiFi();
 }
 
 void loop() {
-  server.handleClient();
+  if (WiFi.status() != WL_CONNECTED) {
+    Serial.println("Wi-Fi disconnected, reconnecting...");
+    connectWiFi();
+  }
+
+  if (millis() - lastSendMs >= sendIntervalMs) {
+    lastSendMs = millis();
+    int ecgValue = analogRead(ECG_PIN);
+    Serial.printf("Raw ECG reading: %d\n", ecgValue);
+
+    bool success = sendData(ecgValue);
+    Serial.printf("Send %s\n", success ? "successful" : "failed");
+  }
 }
