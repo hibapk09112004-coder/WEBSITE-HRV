@@ -1,4 +1,4 @@
-const storage = require('./shared-storage');
+const { kv } = require('@vercel/kv');
 
 const headers = {
   'Content-Type': 'application/json',
@@ -6,9 +6,6 @@ const headers = {
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type',
 };
-
-// Simple in-memory fallback
-let latestData = { receivedAt: 0 };
 
 module.exports = async (req, res) => {
   if (req.method === 'OPTIONS') {
@@ -41,7 +38,11 @@ module.exports = async (req, res) => {
       receivedAt: Date.now(),
     };
 
-    storage.setLatestData(payload);
+    try {
+      await kv.set('ecg:latest', JSON.stringify(payload), { ex: 300 });
+    } catch (kvError) {
+      console.log('KV not available');
+    }
 
     res.writeHead(200, headers);
     res.end(JSON.stringify({ success: true, payload }));
@@ -50,8 +51,6 @@ module.exports = async (req, res) => {
     res.end(JSON.stringify({ error: 'Invalid JSON payload', details: error.message }));
   }
 };
-
-module.exports.getLatestData = () => latestData;
 
 function getBody(req) {
   return new Promise((resolve, reject) => {

@@ -1,20 +1,22 @@
-const storage = require('./shared-storage');
-
-const headers = {
-  'Content-Type': 'application/json',
-  'Access-Control-Allow-Origin': '*',
-};
-
-let latestData = { receivedAt: 0 };
-
-// Export setData so update-data.js can share data
-module.exports.setData = (data) => {
-  latestData = data;
-};
+const { kv } = require('@vercel/kv');
 
 module.exports = async (_, res) => {
+  const headers = {
+    'Content-Type': 'application/json',
+    'Access-Control-Allow-Origin': '*',
+  };
+
   try {
-    const latestData = storage.getLatestData();
+    let latestData = null;
+    try {
+      const stored = await kv.get('ecg:latest');
+      if (stored) {
+        latestData = JSON.parse(stored);
+      }
+    } catch (kvError) {
+      console.log('KV not available');
+    }
+
     if (!latestData || !latestData.receivedAt) {
       res.writeHead(200, headers);
       res.end(
