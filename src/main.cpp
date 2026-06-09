@@ -65,7 +65,9 @@ bool sendData(int rawEcg) {
   String response = https.getString();
   Serial.printf("POST response code: %d\n", httpCode);
   Serial.println("Backend response:");
-  Serial.println(response);
+ Serial.println("========== SERVER RESPONSE ==========");
+Serial.println(response);
+Serial.println("====================================");
 
   if (httpCode <= 0) {
     Serial.printf("POST failed, error: %s\n", https.errorToString(httpCode).c_str());
@@ -79,7 +81,8 @@ bool sendData(int rawEcg) {
 
 void setup() {
   Serial.begin(115200);
-  delay(1000);
+  delay(3000);
+  Serial.println("ESP32 STARTED");
   pinMode(ECG_PIN, INPUT);
   connectWiFi();
 }
