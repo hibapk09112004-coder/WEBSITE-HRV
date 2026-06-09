@@ -1,4 +1,4 @@
-const updateData = require('./update-data');
+const storage = require('./shared-storage');
 
 const headers = {
   'Content-Type': 'application/json',
