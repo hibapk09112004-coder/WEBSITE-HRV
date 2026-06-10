@@ -8,87 +8,99 @@
   <link rel="manifest" href="manifest.json" />
 </head>
 <body>
-  <div class="container">
+  <div class="app-shell">
     <!-- Header -->
-    <header class="header">
-      <h1>HRV Monitor Dashboard</h1>
-      <div class="status-section">
-        <span class="status-dot" id="status-indicator"></span>
-        <span id="status-text">Waiting for connection...</span>
+    <div class="topbar">
+      <div>
+        <p class="eyebrow">Health Monitoring</p>
+        <h1>HRV Monitor</h1>
       </div>
-    </header>
-
-    <!-- Device Status -->
-    <div class="device-status-card">
-      <div class="status-pill" id="device-status">Device Offline</div>
-      <small id="last-update">Last update: --</small>
-      <small id="connection-age">Connection age: --</small>
+      <div class="status-section">
+        <div class="status-pill" id="device-status">Device Offline</div>
+      </div>
     </div>
 
-    <!-- Main Dashboard Grid -->
-    <div class="dashboard-grid">
+    <!-- Summary Cards -->
+    <div class="summary-panel">
+      <div class="summary-card">
+        <h2>Status</h2>
+        <p id="status-text">Waiting for connection...</p>
+        <small id="last-update" class="small-text">Last update: --</small>
+      </div>
+      <div class="summary-card">
+        <h2>Connection Age</h2>
+        <p id="connection-age">--</p>
+      </div>
+      <div class="summary-card">
+        <h2 id="status-indicator"><span class="status-dot" id="status-dot"></span> Indicator</h2>
+        <p id="indicator-text">Initializing...</p>
+      </div>
+    </div>
+
+    <!-- Dashboard Grid -->
+    <div class="grid-panel">
       <!-- Heart Rate Card -->
-      <div class="card">
+      <div class="dashboard-card">
         <div class="card-header">
-          <h3>Heart Rate</h3>
+          <span>Heart Rate</span>
           <span class="status-dot" id="heartRate-dot"></span>
         </div>
         <div class="card-value" id="heartRate">--</div>
-        <div class="card-unit">BPM</div>
-        <div class="card-status" id="heartRate-status">Waiting</div>
+        <p class="card-label">BPM</p>
+        <p class="card-status" id="heartRate-status">Waiting</p>
       </div>
 
       <!-- SpO2 Card -->
-      <div class="card">
+      <div class="dashboard-card">
         <div class="card-header">
-          <h3>SpO2</h3>
+          <span>SpO2</span>
           <span class="status-dot" id="spo2-status-dot"></span>
         </div>
         <div class="card-value" id="spo2">--</div>
-        <div class="card-unit">%</div>
-        <div class="card-status" id="spo2-status">Waiting</div>
+        <p class="card-label">%</p>
+        <p class="card-status" id="spo2-status">Waiting</p>
       </div>
 
       <!-- HRV Card -->
-      <div class="card">
+      <div class="dashboard-card">
         <div class="card-header">
-          <h3>HRV</h3>
+          <span>HRV</span>
           <span class="status-dot" id="hrv-dot"></span>
         </div>
         <div class="card-value" id="hrv">--</div>
-        <div class="card-unit">ms</div>
-        <div class="card-status" id="hrv-status">Waiting</div>
+        <p class="card-label">ms</p>
+        <p class="card-status" id="hrv-status">Waiting</p>
       </div>
 
       <!-- ECG Status Card -->
-      <div class="card">
+      <div class="dashboard-card">
         <div class="card-header">
-          <h3>ECG Status</h3>
+          <span>ECG Status</span>
           <span class="status-dot" id="ecg-dot"></span>
         </div>
         <div class="card-value" id="ecgStatus">--</div>
-        <div class="card-status" id="ecg-status-text">Waiting</div>
+        <p class="card-status" id="ecg-status-text">Waiting</p>
       </div>
 
       <!-- Fall Detection Card -->
-      <div class="card">
+      <div class="dashboard-card">
         <div class="card-header">
-          <h3>Fall Detection</h3>
+          <span>Fall Detection</span>
           <span class="status-dot" id="fall-dot"></span>
         </div>
         <div class="card-value" id="fallDetected">--</div>
-        <div class="card-status" id="fall-status-text">Waiting</div>
+        <p class="card-status" id="fall-status-text">Waiting</p>
       </div>
 
       <!-- Battery Card -->
-      <div class="card">
+      <div class="dashboard-card">
         <div class="card-header">
-          <h3>Battery</h3>
+          <span>Battery</span>
           <span class="status-dot" id="battery-dot"></span>
         </div>
         <div class="card-value" id="battery">--</div>
-        <div class="card-unit">%</div>
-        <div class="card-status" id="battery-status">Waiting</div>
+        <p class="card-label">%</p>
+        <p class="card-status" id="battery-status">Waiting</p>
       </div>
     </div>
   </div>
