@@ -167,12 +167,5 @@ function renderDashboard(payload) {
 fetchLatestData();
 setInterval(fetchLatestData, 1000);
 
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("/service-worker.js")
-  .then(() => {
-    console.log("HRV App Ready");
-  })
-  .catch(error => {
-    console.log("Service Worker Error:", error);
-  });
-}
+
+ 
