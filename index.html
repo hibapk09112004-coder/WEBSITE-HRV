@@ -1,8 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ESP32 ECG Monitoring Dashboard</title>
-
   <link rel="stylesheet" href="styles.css" />
-  
+  <link rel="manifest" href="manifest.json" />
 </head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <h1>HRV Monitor Dashboard</h1>
+      <div class="status-section">
+        <span class="status-dot" id="status-indicator"></span>
+        <span id="status-text">Waiting for connection...</span>
+      </div>
+    </header>
+
+    <!-- Device Status -->
+    <div class="device-status-card">
+      <div class="status-pill" id="device-status">Device Offline</div>
+      <small id="last-update">Last update: --</small>
+      <small id="connection-age">Connection age: --</small>
+    </div>
+
+    <!-- Main Dashboard Grid -->
+    <div class="dashboard-grid">
+      <!-- Heart Rate Card -->
+      <div class="card">
+        <div class="card-header">
+          <h3>Heart Rate</h3>
+          <span class="status-dot" id="heartRate-dot"></span>
+        </div>
+        <div class="card-value" id="heartRate">--</div>
+        <div class="card-unit">BPM</div>
+        <div class="card-status" id="heartRate-status">Waiting</div>
+      </div>
+
+      <!-- SpO2 Card -->
+      <div class="card">
+        <div class="card-header">
+          <h3>SpO2</h3>
+          <span class="status-dot" id="spo2-status-dot"></span>
+        </div>
+        <div class="card-value" id="spo2">--</div>
+        <div class="card-unit">%</div>
+        <div class="card-status" id="spo2-status">Waiting</div>
+      </div>
+
+      <!-- HRV Card -->
+      <div class="card">
+        <div class="card-header">
+          <h3>HRV</h3>
+          <span class="status-dot" id="hrv-dot"></span>
+        </div>
+        <div class="card-value" id="hrv">--</div>
+        <div class="card-unit">ms</div>
+        <div class="card-status" id="hrv-status">Waiting</div>
+      </div>
+
+      <!-- ECG Status Card -->
+      <div class="card">
+        <div class="card-header">
+          <h3>ECG Status</h3>
+          <span class="status-dot" id="ecg-dot"></span>
+        </div>
+        <div class="card-value" id="ecgStatus">--</div>
+        <div class="card-status" id="ecg-status-text">Waiting</div>
+      </div>
+
+      <!-- Fall Detection Card -->
+      <div class="card">
+        <div class="card-header">
+          <h3>Fall Detection</h3>
+          <span class="status-dot" id="fall-dot"></span>
+        </div>
+        <div class="card-value" id="fallDetected">--</div>
+        <div class="card-status" id="fall-status-text">Waiting</div>
+      </div>
+
+      <!-- Battery Card -->
+      <div class="card">
+        <div class="card-header">
+          <h3>Battery</h3>
+          <span class="status-dot" id="battery-dot"></span>
+        </div>
+        <div class="card-value" id="battery">--</div>
+        <div class="card-unit">%</div>
+        <div class="card-status" id="battery-status">Waiting</div>
+      </div>
+    </div>
+  </div>
+
+  <script src="dashboard.js"></script>
+</body>
+</html>
